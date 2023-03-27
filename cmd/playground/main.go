@@ -4,6 +4,8 @@ import (
 	"playground/cmd/playground/channels"
 	"playground/cmd/playground/learn"
 	"playground/cmd/playground/mutex"
+	_select "playground/cmd/playground/select"
+	"playground/cmd/playground/ticker"
 	"playground/cmd/playground/wait_group"
 )
 
@@ -14,4 +16,6 @@ func main() {
 	channels.RunBufferedChannel()
 	wait_group.RunWaitGroup()
 	mutex.RunMutex()
+	ticker.RunTicker()
+	_select.RunSelect()
 }
