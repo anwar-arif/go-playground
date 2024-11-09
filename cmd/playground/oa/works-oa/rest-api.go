@@ -1,10 +1,10 @@
 package works_oa
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -12,84 +12,88 @@ import (
 	"time"
 )
 
-var api_url = "https://jsonmock.hackerrank.com/api/countries/search?region={region}&name={keyword}&page={page_no}"
+const (
+	ApiUrl = "https://jsonmock.hackerrank.com/api/food_outlets"
+)
 
-type Country struct {
-	Name       string `json:"name"`
-	Population int    `json:"population"`
-	//Capital    string   `json:"capital"`
-	//Region     string   `json:"region"`
-	//Currencies []string `json:"currencies"`
-	//Borders    []string `json:"borders"`
+type Rating struct {
+	AverageRating float32 `json:"average_rating"`
+	Votes         int32   `json:"votes"`
+}
+
+type Request struct {
+}
+
+type Record struct {
+	Id            int    `json:"id"`
+	Name          string `json:"name"`
+	City          string `json:"city"`
+	EstimatedCost int    `json:"estimated_cost"`
+	UserRating    Rating `json:"user_rating"`
 }
 
 type Response struct {
-	Page       int       `json:"page"`
-	PerPage    int       `json:"per_page"`
-	Total      int       `json:"total"`
-	TotalPages int       `json:"total_pages"`
-	Data       []Country `json:"data"`
+	Page       int      `json:"page"`
+	PerPage    int      `json:"per_page"`
+	Total      int      `json:"total"`
+	TotalPages int      `json:"total_pages"`
+	Data       []Record `json:"data"`
 }
 
-func GetResponse(region string, keyword string, page int) *Response {
-	searchUrl := "https://jsonmock.hackerrank.com/api/countries/search"
+func GetResponse(city string, pageNo int) *Response {
 	apiClient := http.Client{Timeout: time.Minute * 2}
+	reqBody := &Request{}
+	searchUrl := ApiUrl
 
 	u, _ := url.Parse(searchUrl)
 	q := u.Query()
-	q.Set("region", region)
-	q.Set("name", keyword)
-	q.Set("page", strconv.Itoa(page))
+	q.Set("city", city)
+	q.Set("page", strconv.Itoa(pageNo))
 	u.RawQuery = q.Encode()
 
-	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
-	fmt.Println(req.URL.String())
+	var buf bytes.Buffer
+	_ = json.NewEncoder(&buf).Encode(reqBody)
+	req, _ := http.NewRequest(http.MethodGet, u.String(), &buf)
 
 	resp, _ := apiClient.Do(req)
-	body, parseErr := io.ReadAll(resp.Body)
-	if parseErr != nil {
-		log.Fatal("error reading the body")
-		return nil
-	}
-
+	body, _ := io.ReadAll(resp.Body)
 	var res Response
-	err := json.Unmarshal(body, &res)
-	if err != nil {
-		log.Fatal("error while parsing response body")
-		return nil
-	}
-
+	_ = json.Unmarshal(body, &res)
 	return &res
 }
 
-func FindCountry(region string, keyword string) {
-	res := GetResponse(region, keyword, 1)
-	if res == nil {
-		return
-	}
-	countries := make([]Country, 0)
-	for _, val := range res.Data {
-		countries = append(countries, val)
-	}
-	totalPage := res.TotalPages
-	for page := 2; page <= totalPage; page++ {
-		r := GetResponse(region, keyword, page)
-		if r == nil {
-			continue
-		}
-		for _, c := range r.Data {
-			countries = append(countries, c)
+func solve(city string, minVotes int32) string {
+	r := GetResponse(city, 1)
+	totalPages := r.TotalPages
+
+	outlets := make([]Record, 0)
+	for page := 1; page <= totalPages; page++ {
+		res := GetResponse(city, page)
+		for i := 0; i < len(res.Data); i++ {
+			// do something
+			if res.Data[i].UserRating.Votes >= minVotes {
+				outlets = append(outlets, res.Data[i])
+			}
 		}
 	}
-	fmt.Println(len(countries))
-	sort.SliceStable(countries, func(i, j int) bool {
-		if countries[i].Population == countries[j].Population {
-			return countries[i].Name < countries[j].Name
+
+	sort.SliceStable(outlets, func(i, j int) bool {
+		if outlets[i].UserRating.AverageRating == outlets[j].UserRating.AverageRating {
+			return outlets[i].UserRating.Votes > outlets[j].UserRating.Votes
+		} else {
+			return outlets[i].UserRating.AverageRating > outlets[j].UserRating.AverageRating
 		}
-		return countries[i].Population < countries[j].Population
 	})
 
-	for _, country := range countries {
-		fmt.Println(country.Name, country.Population)
-	}
+	return outlets[0].Name
+}
+
+func finestFoodOutlet(city string, votes int32) string {
+	return solve(city, votes)
+}
+
+func Run() {
+	city := "Seattle"
+	votes := 500
+	fmt.Println(finestFoodOutlet(city, int32(votes)))
 }
