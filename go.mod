@@ -2,11 +2,14 @@ module playground
 
 go 1.20
 
-require github.com/miekg/dns v1.1.56
+require (
+	github.com/google/gopacket v1.1.19
+	github.com/machinebox/graphql v0.2.2
+)
 
 require (
-	golang.org/x/mod v0.13.0 // indirect
+	github.com/matryer/is v1.4.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/tools v0.14.0 // indirect
 )

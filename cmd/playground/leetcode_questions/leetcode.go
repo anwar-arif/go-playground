@@ -8,14 +8,24 @@ import (
 )
 
 type TopicTag struct {
-	Slug string `json:"slug"`
+	Name     string `json:"name"`
+	Slug     string `json:"slug"`
+	Typename string `json:"__typename"`
 }
 
 type Question struct {
-	Difficulty string     `json:"difficulty"`
-	TitleSlug  string     `json:"titleSlug"`
-	TopicTags  []TopicTag `json:"topicTags"`
-	Frequency  float64    `json:"frequency"`
+	Difficulty         string     `json:"difficulty"`
+	ID                 int        `json:"id"`
+	PaidOnly           bool       `json:"paidOnly"`
+	QuestionFrontendID string     `json:"questionFrontendId"`
+	Status             string     `json:"status"`
+	Title              string     `json:"title"`
+	TitleSlug          string     `json:"titleSlug"`
+	TopicTags          []TopicTag `json:"topicTags"`
+	IsInMyFavorites    bool       `json:"isInMyFavorites"`
+	Frequency          float64    `json:"frequency"`
+	AcRate             float64    `json:"acRate"`
+	Typename           string     `json:"__typename"`
 }
 
 type QuestionListResponse struct {
@@ -28,7 +38,7 @@ type QuestionListResponse struct {
 
 func RunLeetCode() {
 	csrf_token := "YZ5YcKTRHFmEcQcto3EfiOOBsPWkhmotGC8qM8hN6HG0yI1qRwIHfZMVpH4yJUV8"
-	session_id := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfYXV0aF91c2VyX2lkIjoiMTM3ODk3MzYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImIxMDhmNTdmNjEwNDcyN2MxZTc2NTAxOGU3MDdkODA4YmE5MjlmODczOWI1NzM4NzQ5MzAwNWQwZGM5ZmM0ZjQiLCJzZXNzaW9uX3V1aWQiOiIwM2U0NDNmMSIsImlkIjoxMzc4OTczNiwiZW1haWwiOiJjb2RlbGVldDIwMjRAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjb2RlbGVldDIwMjQiLCJ1c2VyX3NsdWciOiJjb2RlbGVldDIwMjQiLCJhdmF0YXIiOiJodHRwczovL2Fzc2V0cy5sZWV0Y29kZS5jb20vdXNlcnMvZGVmYXVsdF9hdmF0YXIuanBnIiwicmVmcmVzaGVkX2F0IjoxNzM1Mzg2MjIwLCJpcCI6IjExNi4yMDQuMTQ4LjE5MSIsImlkZW50aXR5IjoiMDg0NWIzMDljN2I5Yjk1N2FmZDllY2Y3NzVhNGMyMWYiLCJkZXZpY2Vfd2l0aF9pcCI6WyI1ZmNkZTVlMmFlNjhjMThjZDdhNmQ4M2EwYzgwMzJkYyIsIjExNi4yMDQuMTQ4LjE5MSJdLCJfc2Vzc2lvbl9leHBpcnkiOjEyMDk2MDB9.yAZYrbWlBQhyk1RTLy3-aESa-XVO0a40lBnZtw4CNOA"
+	session_id := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfYXV0aF91c2VyX2lkIjoiMTM3ODk3MzYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImIxMDhmNTdmNjEwNDcyN2MxZTc2NTAxOGU3MDdkODA4YmE5MjlmODczOWI1NzM4NzQ5MzAwNWQwZGM5ZmM0ZjQiLCJzZXNzaW9uX3V1aWQiOiIwM2U0NDNmMSIsImlkIjoxMzc4OTczNiwiZW1haWwiOiJjb2RlbGVldDIwMjRAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjb2RlbGVldDIwMjQiLCJ1c2VyX3NsdWciOiJjb2RlbGVldDIwMjQiLCJhdmF0YXIiOiJodHRwczovL2Fzc2V0cy5sZWV0Y29kZS5jb20vdXNlcnMvZGVmYXVsdF9hdmF0YXIuanBnIiwicmVmcmVzaGVkX2F0IjoxNzM1Mzg2MjIwLCJpcCI6IjExNi4yMDQuMTQ4LjE4OCIsImlkZW50aXR5IjoiMDg0NWIzMDljN2I5Yjk1N2FmZDllY2Y3NzVhNGMyMWYiLCJkZXZpY2Vfd2l0aF9pcCI6WyI1ZmNkZTVlMmFlNjhjMThjZDdhNmQ4M2EwYzgwMzJkYyIsIjExNi4yMDQuMTQ4LjE4OCJdLCJfc2Vzc2lvbl9leHBpcnkiOjEyMDk2MDB9.8nxM8B359eHxF4ZD2BThG_qk21kxDPfhqnTBhiz3grE"
 	client := graphql.NewClient("https://leetcode.com/graphql")
 
 	req := graphql.NewRequest(`
@@ -45,24 +55,34 @@ func RunLeetCode() {
             ) {
                 questions {
                     difficulty
+                    id
+                    paidOnly
+                    questionFrontendId
+                    status
+                    title
                     titleSlug
                     topicTags {
+                        name
                         slug
+                        __typename
                     }
+                    isInMyFavorites
                     frequency
+                    acRate
+                    __typename
                 }
             }
         }
     `)
 
 	// Headers
-	req.Header.Set("authority", "leetcode.com")
-	req.Header.Set("accept", "*/*")
-	req.Header.Set("content-type", "application/json")
-	req.Header.Set("cookie", fmt.Sprintf("LEETCODE_SESSION=%v; csrftoken=%v", session_id, csrf_token))
-	req.Header.Set("origin", "https://leetcode.com")
-	req.Header.Set("referer", "https://leetcode.com/problemset/")
-	req.Header.Set("x-csrftoken", fmt.Sprintf("%v", csrf_token))
+	req.Header.Set("Authority", "leetcode.com")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Cookie", fmt.Sprintf("LEETCODE_SESSION=%v; csrftoken=%v", session_id, csrf_token))
+	//req.Header.Set("Origin", "https://leetcode.com")
+	//req.Header.Set("Referer", "https://leetcode.com/problemset/")
+	req.Header.Set("X-Csrf-Token", fmt.Sprintf("%v", csrf_token))
 
 	// Set all required variables
 	req.Var("skip", 0)
@@ -76,7 +96,6 @@ func RunLeetCode() {
 		},
 		"difficultyFilter": map[string]interface{}{
 			"difficulties": []string{},
-			"operator":     "IS",
 		},
 		"languageFilter": map[string]interface{}{
 			"languageSlugs": []string{},
@@ -85,22 +104,6 @@ func RunLeetCode() {
 		"topicFilter": map[string]interface{}{
 			"topicSlugs": []string{},
 			"operator":   "IS",
-		},
-		"acceptanceFilter":    map[string]interface{}{},
-		"frequencyFilter":     map[string]interface{}{},
-		"lastSubmittedFilter": map[string]interface{}{},
-		"publishedFilter":     map[string]interface{}{},
-		"companyFilter": map[string]interface{}{
-			"companySlugs": []string{},
-			"operator":     "IS",
-		},
-		"positionFilter": map[string]interface{}{
-			"positionSlugs": []string{},
-			"operator":      "IS",
-		},
-		"premiumFilter": map[string]interface{}{
-			"premiumStatus": []string{},
-			"operator":      "IS",
 		},
 	})
 	req.Var("searchKeyword", "")
