@@ -44,6 +44,17 @@ func RunLargeFileDownloader() {
 	fmt.Println("Download completed successfully!")
 }
 
+/*
+
+The Timeline For The Concurrency Works Like This:
+1. Workers start processing chunks and sending results to the buffered channel
+2. Main goroutine starts reading results with the range loop
+3. Once all workers finish (signaled by WaitGroup), results channel is closed
+4. Main goroutine continues reading remaining results from the channel
+5. When all results are read, the range loop exits
+
+*/
+
 func downloadLargeFile(url, outputPath string, numWorkers int, chunkSize int64) error {
 	// Create a temporary directory for chunks
 	tempDir, err := os.MkdirTemp("", "download-chunks")
