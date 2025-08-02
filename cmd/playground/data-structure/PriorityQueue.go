@@ -5,49 +5,99 @@ import (
 	"fmt"
 )
 
-type PriorityQueue []int64
-
-func (pq PriorityQueue) Len() int           { return len(pq) }
-func (pq PriorityQueue) Less(i, j int) bool { return pq[i] < pq[j] }
-func (pq PriorityQueue) Swap(i, j int)      { pq[i], pq[j] = pq[j], pq[i] }
-func (pq PriorityQueue) IsEmpty() bool      { return len(pq) == 0 }
-
-func (pq *PriorityQueue) Push(x interface{}) {
-	*pq = append(*pq, x.(int64))
+// MinPriorityQueue is a min-heap for int64 values
+type MinPriorityQueue struct {
+	items []int64
 }
 
-func (pq *PriorityQueue) Pop() interface{} {
-	old := *pq
-	item := old[0]
-	*pq = old[1:]
+// Implement heap.Interface
+func (pq *MinPriorityQueue) Len() int           { return len(pq.items) }
+func (pq *MinPriorityQueue) Less(i, j int) bool { return pq.items[i] < pq.items[j] }
+func (pq *MinPriorityQueue) Swap(i, j int)      { pq.items[i], pq.items[j] = pq.items[j], pq.items[i] }
+
+func (pq *MinPriorityQueue) Push(x interface{}) {
+	pq.items = append(pq.items, x.(int64))
+}
+
+func (pq *MinPriorityQueue) Pop() interface{} {
+	old := pq.items
+	n := len(old)
+	item := old[n-1]
+	pq.items = old[0 : n-1]
 	return item
 }
 
-func NewPriorityQueue() *PriorityQueue {
-	pq := &PriorityQueue{}
+// NewMinPQ creates a new min priority queue
+func NewMinPQ() *MinPriorityQueue {
+	pq := &MinPriorityQueue{items: make([]int64, 0)}
 	heap.Init(pq)
 	return pq
 }
 
-func (pq *PriorityQueue) PushVal(val int64) {
-	heap.Push(pq, val)
+// PushValue adds a value to the priority queue
+func (pq *MinPriorityQueue) PushValue(value int64) {
+	heap.Push(pq, value)
 }
 
-func (pq *PriorityQueue) PopVal() (int64, bool) {
+// PopValue removes and returns the smallest value
+func (pq *MinPriorityQueue) PopValue() (int64, bool) {
 	if pq.IsEmpty() {
 		return 0, false
 	}
 	return heap.Pop(pq).(int64), true
 }
 
-func RunPriorityQueue() {
-	pq := NewPriorityQueue()
-	for i := 0; i < 10; i++ {
-		pq.Push(int64(i))
+// Peek returns the smallest value without removing it
+func (pq *MinPriorityQueue) Peek() (int64, bool) {
+	if pq.IsEmpty() {
+		return 0, false
 	}
+	return pq.items[0], true
+}
 
-	for !pq.IsEmpty() {
-		top, _ := pq.PopVal()
-		fmt.Println(top)
+// IsEmpty returns true if the queue is empty
+func (pq *MinPriorityQueue) IsEmpty() bool {
+	return len(pq.items) == 0
+}
+
+// Size returns the number of elements
+func (pq *MinPriorityQueue) Size() int {
+	return len(pq.items)
+}
+
+func RunPriorityQueue() {
+	fmt.Println("=== Testing Priority Queue Correctness ===\n")
+
+	// Test the exact case you mentioned
+	fmt.Println("Test: Push 0-9, then pop all (Min-Heap):")
+	minPQ := NewMinPQ()
+
+	// Push 0 to 9
+	fmt.Print("Pushing: ")
+	for i := int64(0); i < 10; i++ {
+		minPQ.PushValue(i)
+		fmt.Printf("%d ", i)
 	}
+	fmt.Println()
+
+	// Pop all values
+	fmt.Print("Popping: ")
+	result := make([]int64, 0)
+	for !minPQ.IsEmpty() {
+		if val, ok := minPQ.PopValue(); ok {
+			result = append(result, val)
+			fmt.Printf("%d ", val)
+		}
+	}
+	fmt.Printf("\nResult: %v\n", result)
+
+	// Verify it's sorted
+	isCorrect := true
+	for i := 0; i < len(result); i++ {
+		if result[i] != int64(i) {
+			isCorrect = false
+			break
+		}
+	}
+	fmt.Printf("Correct order: %t\n\n", isCorrect)
 }
