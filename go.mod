@@ -1,8 +1,9 @@
 module playground
 
-go 1.20
+go 1.22.5
 
 require (
+	github.com/anwar-arif/golang-dsa v1.0.4
 	github.com/google/gopacket v1.1.19
 	github.com/machinebox/graphql v0.2.2
 )

@@ -3,7 +3,7 @@ package underscore
 import "fmt"
 
 func init() {
-	fmt.Println("init called from underscore pakcage")
+	fmt.Println("init called from underscore package")
 }
 
 func HelloWorld() {
