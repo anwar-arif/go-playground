@@ -1,0 +1,8 @@
+{
+  "name": "Bob",
+  "age": 30,
+  "skills": [
+    "Golang",
+    "AWS"
+  ]
+}
