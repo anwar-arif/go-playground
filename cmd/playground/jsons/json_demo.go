@@ -12,6 +12,7 @@ type Person struct {
 	Skills []string `json:"skills"`
 }
 
+// loadJson reads the json data from json file
 func loadJson() {
 	file, err := os.Open("./jsons/data.json")
 	if err != nil {
@@ -26,6 +27,7 @@ func loadJson() {
 	fmt.Println(person)
 }
 
+// unloadJson writes data to json files
 func unloadJson() {
 	person := Person{
 		Name:   "Bob",
