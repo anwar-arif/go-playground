@@ -78,6 +78,7 @@ func GetResponse(doctorName string, diagnosisId int32, pageNo int) Response {
 	req, _ := http.NewRequest(http.MethodGet, u.String(), &buf)
 
 	resp, _ := apiClient.Do(req)
+	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 
 	var res Response
