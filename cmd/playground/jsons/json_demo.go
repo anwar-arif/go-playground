@@ -12,8 +12,8 @@ type Person struct {
 	Skills []string `json:"skills"`
 }
 
-// loadJson reads the json data from json file
-func loadJson() {
+// readJson reads the json data from json file
+func readJson() {
 	file, err := os.Open("./jsons/data.json")
 	if err != nil {
 		panic(err)
@@ -27,8 +27,8 @@ func loadJson() {
 	fmt.Println(person)
 }
 
-// unloadJson writes data to json files
-func unloadJson() {
+// writeJson writes data to json files
+func writeJson() {
 	person := Person{
 		Name:   "Bob",
 		Age:    30,
@@ -49,6 +49,6 @@ func unloadJson() {
 }
 
 func RunJsonDemo() {
-	loadJson()
-	unloadJson()
+	readJson()
+	writeJson()
 }
