@@ -1,0 +1,4 @@
+id,reference,amount,currency,date,merchant_id,buyer_country,transaction_type,payment_provider,status
+py_1,1,1000,eur,2024-12-24,acct_1,ie,payment,card,payment_completed
+py_2,2,2500,eur,2024-12-24,acct_2,ie,payment,card,payment_failed
+py_3,3,3400,eur,2024-12-25,acct_2,ie,payment,klarna,payment_completed

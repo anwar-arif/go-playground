@@ -1,0 +1,5 @@
+id,reference,amount,currency,date,merchant_id,buyer_country,transaction_type,payment_provider,status
+du_1,py_3,1000,eur,2025-01-01,acct_2,ie,dispute,klarna,dispute_won
+du_2,py_3,1000,eur,2025-01-01,acct_2,ie,dispute,klarna,dispute_lost
+du_3,py_1,1000,eur,2025-01-01,acct_1,ie,dispute,card,dispute_won
+du_4,py_2,2500,eur,2025-01-01,acct_2,ie,dispute,card,dispute_lost
